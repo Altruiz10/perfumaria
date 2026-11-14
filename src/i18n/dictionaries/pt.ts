@@ -205,6 +205,11 @@ const pt = {
     total: "Total",
     back: "Voltar à Maison",
     demo: "Pedido de demonstração — nenhuma cobrança foi realizada.",
+    received: "Pedido recebido",
+    waiting: "Aguardando a confirmação do pagamento. Esta página atualiza sozinha.",
+    failed: "O pagamento não foi aprovado e nada foi cobrado. Você pode tentar novamente.",
+    expired: "Este pedido expirou ou foi cancelado sem pagamento. Faça um novo pedido quando quiser.",
+    retry: "Tentar novamente",
   },
   account: {
     title: "Minha conta",

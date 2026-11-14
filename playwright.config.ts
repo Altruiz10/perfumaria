@@ -20,6 +20,8 @@ export default defineConfig({
   ],
   webServer: {
     command: `npm run start -- -p ${PORT}`,
+    // Production mode requires an explicit backend choice (infra/config.ts): e2e runs on the demo ones.
+    env: { PERSISTENCE: "memory", PAYMENT_GATEWAY: "fake" },
     url: `http://localhost:${PORT}/pt`,
     reuseExistingServer: true,
     timeout: 120_000,

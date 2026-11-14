@@ -132,3 +132,46 @@ for (const path of ["/pt", "/pt/colecao", "/pt/perfume/iris-nocturne", "/pt/fina
     expect(blocking.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
   });
 }
+
+test("CT-024 cartão (gateway de demonstração): confirmação consulta o status no servidor e mostra o aviso de demo", async ({ page }) => {
+  await preConsent(page);
+  await page.goto("/pt/perfume/cedro-branco");
+  await page.getByTestId("add-to-bag").click();
+  await page.getByTestId("mini-cart").getByTestId("go-checkout").click();
+
+  const form = page.getByTestId("checkout-form");
+  await form.getByLabel("Nome completo", { exact: true }).fill("Maria Souza");
+  await form.getByLabel("E-mail", { exact: true }).fill("maria@example.com");
+  await form.getByLabel("CPF", { exact: true }).fill("52998224725");
+  await form.getByLabel("CEP", { exact: true }).fill("01310100");
+  await form.getByLabel("Endereço", { exact: true }).fill("Av. Paulista");
+  await form.getByLabel("Número", { exact: true }).fill("1000");
+  await form.getByLabel("Bairro", { exact: true }).fill("Bela Vista");
+  await form.getByLabel("Cidade", { exact: true }).fill("São Paulo");
+  await form.getByLabel("Estado", { exact: true }).selectOption("SP");
+  await form.locator('input[name="payment"][value="card"]').check();
+  await page.getByTestId("accept-terms").check();
+  await page.getByTestId("place-order").click();
+
+  await expect(page).toHaveURL(/\/pt\/finalizar\/confirmacao$/);
+  await expect(page.getByTestId("order-status")).toHaveAttribute("data-status", "paid");
+  await expect(page.getByTestId("confirmation")).toContainText("Pedido de demonstração");
+  await expect(page.getByTestId("cart-count")).toHaveCount(0);
+});
+
+test("CT-025 retorno do provedor: ?order= consulta o servidor; pedido desconhecido não quebra a página", async ({ page, request }) => {
+  await preConsent(page);
+  expect((await request.get("/api/orders/HM-NAO-EXISTE/status")).status()).toBe(404);
+  expect((await request.get("/api/orders/..%2Fetc/status")).status()).toBe(404);
+
+  await page.goto("/pt/finalizar/confirmacao?order=HM-ABC123-DEF456");
+  await expect(page.getByTestId("confirmation")).toContainText("HM-ABC123-DEF456");
+  await expect(page.getByTestId("order-status")).toHaveAttribute("data-status", "pending_payment");
+});
+
+test("CT-026 webhook sem assinatura válida é rejeitado e nunca altera pedidos", async ({ request }) => {
+  const res = await request.post("/api/webhooks/payments?data.id=123&type=payment", {
+    data: { type: "payment", data: { id: "123" } },
+  });
+  expect(res.status()).toBe(401);
+});

@@ -1,14 +1,24 @@
-import type { Order, OrderRepository } from "@/domain/ports";
+import type { Order, OrderStatus } from "@/domain/order";
+import type { OrderRepository } from "@/domain/ports";
 
-/** MVP only: orders vanish on restart. Replace with a database adapter. */
+/** Development and tests only: orders vanish on restart. Production uses a database adapter. */
 export class InMemoryOrderRepository implements OrderRepository {
   private readonly orders = new Map<string, Order>();
 
-  async save(order: Order): Promise<void> {
-    this.orders.set(order.id, order);
+  async create(order: Order): Promise<void> {
+    if (this.orders.has(order.id)) throw new Error("order_already_exists");
+    this.orders.set(order.id, structuredClone(order));
   }
 
   async findById(id: string): Promise<Order | null> {
-    return this.orders.get(id) ?? null;
+    const hit = this.orders.get(id);
+    return hit ? structuredClone(hit) : null;
+  }
+
+  async update(next: Order, expectedStatus: OrderStatus): Promise<boolean> {
+    const current = this.orders.get(next.id);
+    if (!current || current.status !== expectedStatus) return false;
+    this.orders.set(next.id, structuredClone(next));
+    return true;
   }
 }

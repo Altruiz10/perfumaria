@@ -2,6 +2,7 @@ import { z } from "zod";
 import { sanitizeText } from "@/lib/sanitize";
 import { UFS, digits, isValidCep, isValidCpf } from "./br";
 import { MAX_QUANTITY } from "./cart";
+import { DEFAULT_LOCALE, LOCALES } from "./locale";
 
 export { UFS, isValidCep, isValidCpf };
 
@@ -39,6 +40,8 @@ export const checkoutSchema = z.object({
     )
     .min(1)
     .max(50),
+  /** Language the customer shopped in: drives the return URL now, transactional e-mail later. */
+  locale: z.enum(LOCALES).default(DEFAULT_LOCALE),
   acceptTerms: z.literal(true),
   marketingOptIn: z.boolean().default(false),
 });

@@ -207,6 +207,11 @@ const en: Dictionary = {
     total: "Total",
     back: "Back to the Maison",
     demo: "Demo order — no charge has been made.",
+    received: "Order received",
+    waiting: "Waiting for the payment to be confirmed. This page updates by itself.",
+    failed: "The payment was not approved and nothing was charged. You can try again.",
+    expired: "This order expired or was cancelled without payment. Place a new order whenever you like.",
+    retry: "Try again",
   },
   account: {
     title: "My account",

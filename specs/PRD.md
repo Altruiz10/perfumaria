@@ -26,7 +26,7 @@ internacional de luxo: editorial, silenciosa, cinematográfica — e rápida no 
 | Catálogo | Grid editorial, filtros (família, gênero), ordenação, busca tolerante a acento e erro de digitação |
 | Produto | Galeria grande, storytelling, pirâmide olfativa, escolha de tamanho, CTA, JSON-LD Product |
 | Sacola | Mini cart lateral, quantidades, persistência local, frete grátis acima do limite (R3) |
-| Checkout | Uma página, validação cliente+servidor, total recalculado no servidor (R2), gateway **falso** atrás de interface (Stripe / Mercado Pago / Pix plugáveis) |
+| Checkout | Uma página, validação cliente+servidor, total recalculado no servidor (R2). Pedido gravado no Supabase; pagamento por **Mercado Pago** (Pix na página, cartão no Checkout Pro) atrás de interface; status confirmado só por webhook; gateway falso apenas para demonstração |
 | Conta | Estrutura: login (desabilitado), favoritos funcionais (local), pedidos e endereços como estado vazio |
 | i18n | pt (padrão), en, es; URLs traduzidas; seletor com bandeiras; persistência |
 | Tema | Claro/escuro, respeita sistema, persiste, sem flash |
@@ -40,9 +40,9 @@ internacional de luxo: editorial, silenciosa, cinematográfica — e rápida no 
 - Jornada "home → produto → sacola → checkout → confirmação" concluída em ≤ 6 toques no mobile.
 
 ## Não objetivos (MVP)
-- Gateway de pagamento real, emissão de nota fiscal, cálculo de frete por CEP.
-- Autenticação real, backend de pedidos, painel administrativo.
-- CMS/ERP/CRM conectados (a arquitetura prepara, não integra — ver ARCHITECTURE §Portas).
+- Emissão de nota fiscal, cálculo de frete por CEP, e-mail transacional, controle de estoque.
+- Autenticação real e painel administrativo.
+- CMS/ERP/CRM conectados (o catálogo segue em código) (a arquitetura prepara, não integra — ver ARCHITECTURE §Portas).
 - Fotografia real: imagens são placeholders gerados até a sessão de fotos.
 
 ## Riscos conhecidos

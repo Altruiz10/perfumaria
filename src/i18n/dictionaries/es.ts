@@ -207,6 +207,11 @@ const es: Dictionary = {
     total: "Total",
     back: "Volver a la Maison",
     demo: "Pedido de demostración — no se ha realizado ningún cobro.",
+    received: "Pedido recibido",
+    waiting: "Esperando la confirmación del pago. Esta página se actualiza sola.",
+    failed: "El pago no fue aprobado y no se realizó ningún cobro. Puedes intentarlo de nuevo.",
+    expired: "El pedido caducó o fue cancelado sin pago. Haz un nuevo pedido cuando quieras.",
+    retry: "Intentar de nuevo",
   },
   account: {
     title: "Mi cuenta",

@@ -9,6 +9,7 @@ import { LockIcon } from "@/components/ui/icons";
 import { priceCart, type PaymentMethod } from "@/domain/cart";
 import { UFS } from "@/domain/br";
 import { formatMoney } from "@/domain/money";
+import type { PaymentResult } from "@/domain/payment";
 import { t } from "@/i18n/dictionaries";
 import { localizePath } from "@/i18n/routes";
 import { track } from "@/infra/analytics/analytics";
@@ -79,6 +80,7 @@ export function CheckoutForm() {
         state: s("state"),
       },
       paymentMethod: method,
+      locale,
       items: lines.map(({ slug, sizeMl, quantity }) => ({ slug, sizeMl, quantity })),
       acceptTerms: fd.get("acceptTerms") === "on",
       marketingOptIn: fd.get("marketingOptIn") === "on",
@@ -114,7 +116,16 @@ export function CheckoutForm() {
       } catch {
         /* ignore */
       }
-      track({ name: "purchase", orderId: data.orderId, value: data.total });
+      const payment = data.payment as PaymentResult;
+      if (payment.method === "card" && payment.status === "pending") {
+        // Hosted card page. The bag is kept until the order is actually paid, so abandoning
+        // there loses nothing; the provider sends the customer back to the confirmation page.
+        if (payment.redirectUrl.startsWith("https://")) {
+          setSending(true); // stay disabled while the browser leaves
+          window.location.assign(payment.redirectUrl);
+        } else setFormError(c.errors.generic);
+        return;
+      }
       dispatch({ type: "clear" });
       router.push(L("/checkout/confirmation"));
       return;

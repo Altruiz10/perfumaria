@@ -29,11 +29,21 @@ Pirâmide alvo: ~70% unitário, ~20% integração, ~10% e2e.
 - CT-018 E2E: trocar idioma preserva a página e traduz a URL; preferência persiste
 - CT-019 E2E: tema escuro persiste após reload
 - CT-020 E2E: axe sem violações serious/critical em home, coleção, produto, checkout (A1)
+- CT-021 Máquina de estados do pedido: transições legais, evento repetido é no-op, recusa pode virar pago, evento atrasado nunca desfaz pagamento, estados finais não saem
+- CT-022 Pedido é gravado como pendente ANTES de cobrar; gateway fora do ar deixa o pedido falho; falha ao registrar a cobrança não derruba pagamento já criado
+- CT-023 Webhook: assinatura inválida → 401 sem consultar; valor divergente nunca marca pago (R2); idempotente; perde corrida de CAS e decide de novo; erro de banco → reenvio
+- CT-024 E2E: cartão (demo) → confirmação consulta o status no servidor e mostra aviso de demonstração
+- CT-025 E2E: retorno `?order=` consulta o servidor; pedido desconhecido não quebra a página
+- CT-026 E2E: webhook sem assinatura válida → 401
+- CT-027 Contrato de `OrderRepository` (create/find/update CAS/concorrência) idêntico para memória e Supabase; Supabase real é opt-in (`SUPABASE_TEST_*`)
+- CT-028 Mercado Pago: centavos↔reais sem erro de float, itens+frete = total (R2), assinatura HMAC, status→domínio, erro sem corpo da resposta (C5)
+- CT-029 Config: produção sem `PERSISTENCE`/`PAYMENT_GATEWAY` recusa; valor inválido nomeia a variável sem vazar o valor
 
-## Resultado atual (22/09/2026)
-- Unitários + integração: 78 passando (Vitest).
-- E2E: 26 passando (13 cenários × mobile Pixel 7 + desktop 1440), incluindo axe WCAG 2.2 AA sem violações serious/critical.
-- Lighthouse mobile (mediana de 3, servidor local): home perf 86–93, produto ~92, coleção 88–97; acessibilidade, boas práticas e SEO 100.
+## Resultado atual (14/11/2026)
+- Unitários + integração: 153 passando, 7 do contrato Supabase real pulados sem projeto (Vitest).
+- E2E: 32 passando (16 cenários × mobile Pixel 7 + desktop 1440), incluindo axe WCAG 2.2 AA sem violações serious/critical.
+- Migração SQL validada em Postgres 16 local (constraints, unicidade, CAS, trigger, RLS). **Não** testado contra um projeto Supabase nem contra o Mercado Pago reais: falta rodar o contrato live e um pagamento no sandbox.
+- Lighthouse: última medição em 22/09/2026 (home perf 86–93, produto ~92, coleção 88–97); não repetida após esta mudança.
 
 ## O que NÃO testar
 - Estilo visual fino (cores, tamanhos) — verificado por screenshot manual.

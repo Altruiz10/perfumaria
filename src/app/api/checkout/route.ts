@@ -1,6 +1,7 @@
 import { placeOrder } from "@/application/place-order";
 import { container } from "@/infra/container";
 import { isCsrfValid, json, readJson } from "@/lib/http";
+import { errorFields, logEvent } from "@/lib/log";
 
 /** ADR-004: POST /api/checkout — CSRF (S3) → schema (S4, R9) → server pricing (R2). */
 export async function POST(req: Request): Promise<Response> {
@@ -9,7 +10,14 @@ export async function POST(req: Request): Promise<Response> {
   const body = await readJson(req);
   if (body === undefined) return json({ error: "bad_request" }, 400);
 
-  const result = await placeOrder(body, container);
+  let result;
+  try {
+    result = await placeOrder(body, container);
+  } catch (error) {
+    // The order could not even be stored (database down): nothing was charged.
+    logEvent("checkout", "place_order_failed", errorFields(error));
+    return json({ error: "unavailable_service" }, 503);
+  }
   if (!result.ok) {
     if (result.error === "validation") return json({ error: "validation", fields: result.fields }, 422);
     if (result.error === "unavailable") return json({ error: "unavailable" }, 409);

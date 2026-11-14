@@ -2,6 +2,8 @@
 # Start the production server on :3100 in the background, replacing any previous one.
 set -e
 PORT=${PORT:-3100}
+# Production mode refuses to guess a backend (infra/config.ts); local runs are demos.
+export PERSISTENCE=${PERSISTENCE:-memory} PAYMENT_GATEWAY=${PAYMENT_GATEWAY:-fake}
 for d in /proc/[0-9]*; do
   if tr '\0' ' ' < "$d/cmdline" 2>/dev/null | grep -q '^next-server'; then kill "${d#/proc/}" 2>/dev/null || true; fi
 done
